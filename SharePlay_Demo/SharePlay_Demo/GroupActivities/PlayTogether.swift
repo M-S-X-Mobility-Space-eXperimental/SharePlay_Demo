@@ -13,7 +13,7 @@ struct PlayTogether: GroupActivity, Transferable {
         var metadata = GroupActivityMetadata()
         metadata.title = NSLocalizedString("Play Together",
                                            comment: "Set Off the Geyser")
-//        metadata.type = .generic
+        metadata.type = .generic
         return metadata
     }
 }

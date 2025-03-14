@@ -44,6 +44,19 @@ struct ContentView: View {
                     .animation(.none, value: 0)
                     .fontWeight(.semibold)
                     
+                    Button {
+                        if let players = appModel.sessionController?.players {
+                            print("players size: \(players.count)")
+//                            for (participant, playerModel) in players {
+//                                print("Participant ID: \(participant.id)")
+//                                print("Player enlarged bool: \(playerModel.enlarged)")
+//                                print("-----------------------")
+//                            }
+                        }
+                    } label: {
+                        Text("print")
+                    }
+                    
                     SharePlayButton().padding(.vertical, 20)
                     ToggleImmersiveSpaceButton()
                 }
