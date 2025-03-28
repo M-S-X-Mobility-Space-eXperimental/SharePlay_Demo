@@ -12,33 +12,36 @@ struct WelcomeView: View {
     @Environment(AppModel.self) var appModel
     
     var body: some View {
-        VStack {
-            Image("yellowstone_logo")
-                        .resizable()
-                        .scaledToFit()
-            
-            Text("Explore Yellowstone Together!")
-                .font(.extraLargeTitle)
-            
-            Text("""
-                Welcome to Explore Yellowstone National Park Together, a future edutainment experience in a Honda vehicle! \
-                \n\nTo play, join a FaceTime call with family members or friends. \
-                \n\nYou'll explore the secrets and learn the fun facts behind various attractions.
-                """
-            )
-            .multilineTextAlignment(.center)
-            .padding()
-            
-            Divider()
-            
-            Button("Print Activity Stage") {
-                print(appModel.sessionController?.game.stage ?? "sessionController not initialized yet.")
+        if appModel.immersiveSpaceState == .closed {
+            VStack {
+                Image("yellowstone_logo")
+                    .resizable()
+                    .scaledToFit()
+                
+                Text("Explore Yellowstone Together!")
+                    .font(.extraLargeTitle)
+                
+                Text("""
+                    Welcome to Explore Yellowstone National Park Together, a future edutainment experience in a Honda vehicle! \
+                    \n\nTo play, join a FaceTime call with family members or friends. \
+                    \n\nYou'll explore the secrets and learn the fun facts behind various attractions.
+                    """
+                )
+                .multilineTextAlignment(.center)
+                .padding()
+                
+                Divider()
+                
+                Button("Print Activity Stage") {
+                    print(appModel.sessionController?.game.stage ?? "sessionController not initialized yet.")
+                }
+                
+                SharePlayButton().padding(.vertical, 20)
             }
-            
-            SharePlayButton().padding(.vertical, 20)
+            .glassBackgroundEffect()
+        } else {
+            EmptyView()
         }
-        
-//        .padding(.horizontal)
     }
 }
 

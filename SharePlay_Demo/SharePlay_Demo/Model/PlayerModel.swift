@@ -11,7 +11,7 @@ import SwiftUI
 struct PlayerModel: Codable, Hashable, Sendable, Identifiable {
     let id: UUID
 
-    var enlarged: Bool = false
+    var success: Bool = false
     
 //    var seatPose: Pose3D?
 }

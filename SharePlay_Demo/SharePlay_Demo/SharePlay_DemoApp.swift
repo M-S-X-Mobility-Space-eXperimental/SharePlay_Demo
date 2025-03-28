@@ -11,15 +11,18 @@ import SwiftUI
 struct SharePlay_DemoApp: App {
 
     @State private var appModel = AppModel()
-
+    @Environment(\.openImmersiveSpace) var openImmersiveSpace
+    
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
+            if appModel.immersiveSpaceState == .closed {
                 ContentView()
                     .environment(appModel)
+                .frame(width: 1200, height: 800)
+                .opacity(appModel.immersiveSpaceState == .open ? 0 : 1)
             }
-            .frame(width: 900, height: 600)
         }
+        .windowStyle(.volumetric)
 
         ImmersiveSpace(id: appModel.immersiveSpaceID) {
             ImmersiveView()
@@ -32,5 +35,30 @@ struct SharePlay_DemoApp: App {
                 }
         }
         .immersionStyle(selection: .constant(.mixed), in: .mixed)
+        .onChange(of: appModel.sessionController?.game.stage, updateImmersiveSpaceState)
+    }
+    
+    func updateImmersiveSpaceState(){
+        Task {
+            switch appModel.immersiveSpaceState {
+                case .closed:
+                    appModel.immersiveSpaceState = .inTransition
+                    switch await openImmersiveSpace(id: appModel.immersiveSpaceID) {
+                    case .opened:
+                        fallthrough
+                    case .userCancelled:
+                        fallthrough
+                    case .error:
+                        fallthrough
+                    @unknown default:
+                        appModel.immersiveSpaceState = .closed
+                    }
+                    
+                case .open:
+                    print("immersiveSpace is opened")
+                case .inTransition:
+                    break
+            }
+        }
     }
 }

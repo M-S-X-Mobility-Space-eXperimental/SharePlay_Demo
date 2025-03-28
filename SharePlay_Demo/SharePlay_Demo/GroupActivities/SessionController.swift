@@ -33,6 +33,7 @@ class SessionController {
             if newValue != gameSyncStore.game {
                 gameSyncStore.game = newValue
                 shareLocalGameState(newValue)
+                gameStateChanged()
             }
         }
     }
@@ -71,6 +72,7 @@ class SessionController {
         self.localPlayer = PlayerModel(
             id: session.localParticipant.id
         )
+        
         
         observeRemoteParticipantUpdates()
         configureSystemCoordinator()
@@ -113,16 +115,20 @@ class SessionController {
         Task {
             for await (player, context) in messenger.messages(of: PlayerModel.self) {
                 players[context.source] = player
-                if player.enlarged != self.localPlayer.enlarged {
-                    self.localPlayer.enlarged.toggle() //*************
+                if player.success != self.localPlayer.success {
+                    self.localPlayer.success.toggle() //*************
                 }
-
             }
         }
     }
     
     func gameStateChanged() {
         updateSpatialTemplatePreference()
+    }
+    
+    func enter_geyser_set_off_game() {
+        game.stage = .InGame_Geyser
+        game.currentStageTimeLeft = 5.0
     }
     
     func updateSpatialTemplatePreference() {

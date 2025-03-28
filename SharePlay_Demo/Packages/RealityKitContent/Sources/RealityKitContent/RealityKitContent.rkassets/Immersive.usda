@@ -9,7 +9,7 @@ reorder rootPrims = ["Root", "GridMaterial"]
 
 def Xform "Root"
 {
-    reorder nameChildren = ["Car_V1", "Environment", "SkyDome", "SkyDomeMaterial", "CarMovement"]
+    reorder nameChildren = ["Car_V1", "Environment", "SkyDome", "SkyDomeMaterial", "CarMovement", "SandboxRotation"]
     def "Car_V1" (
         active = true
         customData = {
@@ -20,7 +20,7 @@ def Xform "Root"
     {
         quatf xformOp:orient = (0.50000006, -0.4999999, -0.5000001, -0.49999994)
         float3 xformOp:scale = (0.01, 0.01, 0.01)
-        float3 xformOp:translate = (-0.35, 0.3, -3)
+        float3 xformOp:translate = (-0.35, 0.2, -3.5)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 
         over "Body90_4" (
@@ -253,12 +253,12 @@ def Xform "Root"
             {
                 string actionKind = "moveTo"
                 int blendLayer = 300
-                double duration = 30
+                double duration = 25
                 uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
                 float3 position = (1015.8237, 100, -949.47327)
                 quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
                 float3 scale = (100, 100, 100)
-                double startTime = 0
+                double startTime = 5
                 rel target = </Root/Environment>
 
                 def RealityKitStruct "transformMode"
@@ -566,6 +566,85 @@ def Xform "Root"
                     rel referenceEntity = </Root>
                     token type = "parent"
                 }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To4"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 4.999999999999999
+                uniform token info:id = "E11C2B9B-2C5E-4D58-B04E-61729B2ECD17"
+                double startTime = 0
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+        }
+    }
+
+    def "Sandbox" (
+        active = false
+        references = @Sandbox.usda@
+    )
+    {
+        float3 xformOp:scale = (0.1, 0.1, 0.1)
+        float3 xformOp:translate = (-0.19728103, 0.8014107, -1.4641137)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def RealityKitComponent "RCP_BehaviorsContainer"
+        {
+            rel behaviors = </Root/Sandbox/OnAddedToScene>
+            uniform token info:id = "RCP.BehaviorsContainer"
+        }
+
+        def Preliminary_Behavior "OnAddedToScene"
+        {
+            rel actions = </Root/Sandbox/OnAddedToScene/Action>
+            uniform bool exclusive
+            rel triggers = </Root/Sandbox/OnAddedToScene/Trigger>
+
+            def Preliminary_Trigger "Trigger"
+            {
+                rel affectedObjects = </Root/Sandbox>
+                token info:id = "SceneTransition"
+            }
+
+            def Preliminary_Action "Action"
+            {
+                rel affectedObjects = </Root>
+                rel animationLibraryKey = </Root/SandboxRotation>
+                rel animationLibraryKeyOverrideKey = </Root/Sandbox/OnAddedToScene/Trigger>
+                token info:id = "PlayTimeline"
+                int loops = 0
+                int performCount = 1
+                token type = "serial"
+            }
+        }
+    }
+
+    def RealityKitTimeline "SandboxRotation"
+    {
+        def RealityKitTrack "Track"
+        {
+            def RealityKitAction "Spin"
+            {
+                string actionKind = "spin"
+                int blendLayer = 400
+                double duration = 300
+                uniform token info:id = "0355ECE4-35E3-444B-B834-EA2A20C88D83"
+                double startTime = 0
+                rel target = </Root/Sandbox>
 
                 def RealityKitStruct "timingFunction"
                 {

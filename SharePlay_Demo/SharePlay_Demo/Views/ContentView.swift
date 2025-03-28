@@ -19,7 +19,7 @@ struct ContentView: View {
             case .none:
                 WelcomeView()
             case .Pre_Geyser:
-                WelcomeView()
+                Pre_Geyser_View()
             case .InGame_Geyser:
                 WelcomeView()
             case .After_Geyser:

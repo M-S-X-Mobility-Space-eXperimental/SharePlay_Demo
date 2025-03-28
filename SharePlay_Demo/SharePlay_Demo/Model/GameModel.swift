@@ -12,7 +12,7 @@ import GroupActivities
 struct GameModel: Codable, Hashable, Sendable {
     var stage: ActivityStage = .Pre_Geyser
     
-    var currentRoundEndTime: Date?
+    var currentStageTimeLeft: TimeInterval = 51.0
 }
 
 extension GameModel {

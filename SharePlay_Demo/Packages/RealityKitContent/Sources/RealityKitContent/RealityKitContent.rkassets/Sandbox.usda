@@ -1,0 +1,278 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "Reality Composer Pro Version 2.0 (448.60.4)"
+    }
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    float3 xformOp:scale = (0.15, 0.15, 0.15)
+    float3 xformOp:translate = (-0.3, 0.6, -0.2)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+    def Xform "GeyserGroup"
+    {
+        reorder nameChildren = ["msx_geyser_sfx_v1_wav", "geyser", "holder", "RCP_BehaviorsContainer", "OnAddedToScene", "AudioLibrary", "Eruption"]
+        def "geyser" (
+            active = true
+            references = @geyser/geyser.usdz@
+        )
+        {
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (0.1, 0.1, 0.1)
+            float3 xformOp:translate = (0, -0.029551268, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            over "mtl"
+            {
+                over "geyser_lowSG"
+                {
+                    token outputs:mtlx:surface
+                    token outputs:realitykit:vertex
+                }
+            }
+        }
+
+        def "holder" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            references = @geyser/holder.usdz@
+        )
+        {
+            rel material:binding = </Root/GeyserGroup/holder/Materials/defaultMaterial> (
+                bindMaterialAs = "strongerThanDescendants"
+            )
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (3.05, 0.29999998, 3.05)
+            float3 xformOp:translate = (0, -0.15981483, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            over "mtl"
+            {
+                over "initialShadingGroup" (
+                    references = @../SmoothConcrete.usdz@
+                )
+                {
+                    token outputs:mtlx:surface
+                    token outputs:realitykit:vertex
+                    float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (0, 110.5)
+                }
+            }
+
+            over "Materials"
+            {
+                over "defaultMaterial"
+                {
+                    token outputs:mtlx:surface
+                    token outputs:realitykit:vertex
+
+                    over "Shader"
+                    {
+                        color3f inputs:diffuseColor = (0.12354091, 0.25806898, 0.058172576) (
+                            colorSpace = "srgb_texture"
+                        )
+                    }
+                }
+            }
+        }
+
+        def RealityKitComponent "RCP_BehaviorsContainer"
+        {
+            rel behaviors = [
+                </Root/GeyserGroup/OnAddedToScene>,
+                </Root/GeyserGroup/OnTap>,
+            ]
+            uniform token info:id = "RCP.BehaviorsContainer"
+        }
+
+        def Preliminary_Behavior "OnAddedToScene"
+        {
+            rel actions = </Root/GeyserGroup/OnAddedToScene/Action>
+            uniform bool exclusive
+            rel triggers = </Root/GeyserGroup/OnAddedToScene/Trigger>
+
+            def Preliminary_Trigger "Trigger"
+            {
+                rel affectedObjects = </Root/GeyserGroup>
+                token info:id = "SceneTransition"
+            }
+
+            def Preliminary_Action "Action"
+            {
+                rel affectedObjects = </Root>
+                rel animationLibraryKey = </Root/SandboxRotation>
+                rel animationLibraryKeyOverrideKey = </Root/GeyserGroup/OnAddedToScene/Trigger>
+                token info:id = "PlayTimeline"
+                int loops = 0
+                int performCount = 1
+                token type = "serial"
+            }
+        }
+
+        def RealityKitComponent "AudioLibrary"
+        {
+            uniform token info:id = "RealityKit.AudioLibrary"
+
+            def RealityKitDict "resources"
+            {
+                string[] keys = ["msx geyser sfx v1.wav", "Geyser Intro.mp3"]
+                rel values = [
+                    </Root/msx_geyser_sfx_v1_wav>,
+                    </Root/Geyser_Intro_mp3>,
+                ]
+            }
+        }
+
+        def "Eruption" (
+            references = @Eruption.usdz@
+        )
+        {
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (0.99999976, 0.99999976, 0.99999976)
+            float3 xformOp:translate = (0.5184778, -0.6036072, 0.20720375)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+
+        def RealityKitComponent "Collider"
+        {
+            uint group = 1
+            uniform token info:id = "RealityKit.Collider"
+            uint mask = 4294967295
+            token type = "Default"
+
+            def RealityKitStruct "Shape"
+            {
+                float3 extent = (6.0065885, 0.6966542, 6.006589)
+                token shapeType = "Box"
+
+                def RealityKitStruct "pose"
+                {
+                    float3 position = (0, -0.11140166, -5.9604645e-7)
+                }
+            }
+        }
+
+        def RealityKitComponent "InputTarget"
+        {
+            bool allowsDirectInput = 1
+            bool allowsIndirectInput = 1
+            uniform token info:id = "RealityKit.InputTarget"
+        }
+
+        def Preliminary_Behavior "OnTap"
+        {
+            rel actions = </Root/GeyserGroup/OnTap/Action>
+            uniform bool exclusive
+            rel triggers = </Root/GeyserGroup/OnTap/Trigger>
+
+            def Preliminary_Trigger "Trigger"
+            {
+                rel affectedObjects = </Root/GeyserGroup>
+                token info:id = "TapGesture"
+            }
+
+            def Preliminary_Action "Action"
+            {
+                rel affectedObjects = </Root>
+                rel animationLibraryKey = </Root/Eruption>
+                rel animationLibraryKeyOverrideKey = </Root/GeyserGroup/OnTap/Trigger>
+                token info:id = "PlayTimeline"
+                int loops = 0
+                int performCount = 1
+                token type = "serial"
+            }
+        }
+    }
+
+    def RealityKitTimeline "SandboxRotation"
+    {
+        reorder nameChildren = ["Track", "Track2"]
+        def RealityKitTrack "Track"
+        {
+            def RealityKitAction "Spin"
+            {
+                string actionKind = "spin"
+                int blendLayer = 400
+                double duration = 300
+                uniform token info:id = "6078505D-6757-40B7-A06E-D1DC405D69F7"
+                double startTime = 0
+                rel target = </Root/GeyserGroup>
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+        }
+
+        def RealityKitTrack "Track2"
+        {
+            def RealityKitAction "Play_Audio"
+            {
+                string actionKind = "audio"
+                string audioResourceName = "Geyser Intro.mp3"
+                bool controlPlayback = 1
+                double duration = 50.18120833333333
+                double gain = 0
+                uniform token info:id = "C344393C-0AC0-415E-A680-649E4C3AEEFA"
+                double startTime = 0
+                rel target = </Root/GeyserGroup>
+
+                def RealityKitStruct "handoffType"
+                {
+                }
+            }
+        }
+    }
+
+    def RealityKitTimeline "Eruption"
+    {
+        reorder nameChildren = ["Track", "Track2"]
+        def RealityKitTrack "Track"
+        {
+            def RealityKitAction "Enable_Entity"
+            {
+                string actionKind = "enable"
+                double duration = 0
+                uniform token info:id = "27193242-49A0-47C8-9F21-FB8209F001A7"
+                double startTime = 0.5
+                rel target = </Root/GeyserGroup/Eruption>
+            }
+        }
+
+        def RealityKitTrack "Track2"
+        {
+            def RealityKitAction "Play_Audio"
+            {
+                string actionKind = "audio"
+                string audioResourceName = "msx geyser sfx v1.wav"
+                bool controlPlayback = 1
+                double duration = 19.18
+                double gain = -12.00501614391144
+                uniform token info:id = "B273884E-BF7A-4F7F-935A-69BBB7CFFDF5"
+                double startTime = 0
+                rel target = </Root/GeyserGroup>
+
+                def RealityKitStruct "handoffType"
+                {
+                }
+            }
+        }
+    }
+
+    def RealityKitAudioFile "msx_geyser_sfx_v1_wav"
+    {
+        uniform asset file = @msx geyser sfx v1.wav@
+        uniform bool shouldLoop = 0
+    }
+
+    def RealityKitAudioFile "Geyser_Intro_mp3"
+    {
+        uniform asset file = @Geyser Intro.mp3@
+        uniform bool shouldLoop = 0
+    }
+}
+
