@@ -31,6 +31,10 @@ struct WelcomeView: View {
             
             Divider()
             
+            Button("Print Activity Stage") {
+                print(appModel.sessionController?.game.stage ?? "sessionController not initialized yet.")
+            }
+            
             SharePlayButton().padding(.vertical, 20)
         }
         
