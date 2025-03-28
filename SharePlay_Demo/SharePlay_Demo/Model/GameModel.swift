@@ -13,6 +13,7 @@ struct GameModel: Codable, Hashable, Sendable {
     var stage: ActivityStage = .Pre_Geyser
     
     var currentStageTimeLeft: TimeInterval = 51.0
+    var geyser_set_off = false
 }
 
 extension GameModel {

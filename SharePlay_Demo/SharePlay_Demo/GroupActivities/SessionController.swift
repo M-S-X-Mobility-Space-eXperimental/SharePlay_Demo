@@ -109,20 +109,35 @@ class SessionController {
     
     func observeRemoteParticipantUpdates() {
         observeRemotePlayerModelUpdates()
+        observeRemoteGameModelUpdates()
     }
     
     private func observeRemotePlayerModelUpdates() {
         Task {
             for await (player, context) in messenger.messages(of: PlayerModel.self) {
                 players[context.source] = player
-                if player.success != self.localPlayer.success {
-                    self.localPlayer.success.toggle() //*************
+//                if player.success != self.localPlayer.success {
+//                    self.localPlayer.success.toggle() //*************
+//                }
+                if players.values.allSatisfy({ $0.success == true }) {
+                    // All players have success true. Trigger your action.
+                    print("all players success")
+                    game.geyser_set_off = true
                 }
             }
         }
     }
     
+    private func observeRemoteGameModelUpdates() {
+        Task {
+            for await (gameModel, context) in messenger.messages(of: GameModel.self) {
+                self.game = gameModel
+            }
+        }
+    }
+    
     func gameStateChanged() {
+        
         updateSpatialTemplatePreference()
     }
     
