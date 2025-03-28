@@ -9,46 +9,569 @@ reorder rootPrims = ["Root", "GridMaterial"]
 
 def Xform "Root"
 {
-    reorder nameChildren = ["Sphere_Left", "Sphere_Right", "GridMaterial"]
-    def Sphere "Sphere_Right" (
+    reorder nameChildren = ["Car_V1", "Environment", "SkyDome", "SkyDomeMaterial", "CarMovement"]
+    def "Car_V1" (
         active = true
-        prepend apiSchemas = ["MaterialBindingAPI"]
+        customData = {
+            float3 rotationEulerHint = (1.570796, -1.5707963, 0)
+        }
+        references = @Car_V1.usdz@
     )
     {
-        rel material:binding = </Root/GridMaterial/GridMaterial> (
-            bindMaterialAs = "weakerThanDescendants"
-        )
-        double radius = 0.1
-        quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (0.5, 1.5, -1.5)
+        quatf xformOp:orient = (0.50000006, -0.4999999, -0.5000001, -0.49999994)
+        float3 xformOp:scale = (0.01, 0.01, 0.01)
+        float3 xformOp:translate = (-0.35, 0.3, -3)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        over "Body90_4" (
+            active = false
+        )
+        {
+        }
     }
 
-    def Sphere "Sphere_Left" (
+    def "Environment" (
         active = true
-        prepend apiSchemas = ["MaterialBindingAPI"]
+        customData = {
+            float3 rotationEulerHint = (3.4324833e-7, 1.134464, 2.6900604e-13)
+        }
+        references = @Environment.usdz@
     )
     {
-        rel material:binding = </Root/GridMaterial/GridMaterial> (
-            bindMaterialAs = "weakerThanDescendants"
-        )
-        double radius = 0.1
-        quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (-0.5, 1.5, -1.5)
+        quatf xformOp:orient = (0.8433914, 1.4474628e-7, 0.53729963, -9.221349e-8)
+        float3 xformOp:scale = (100, 100, 100)
+        float3 xformOp:translate = (1015.8237, 100, -1563.428)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def RealityKitComponent "RCP_BehaviorsContainer"
+        {
+            rel behaviors = </Root/Environment/OnAddedToScene>
+            uniform token info:id = "RCP.BehaviorsContainer"
+        }
+
+        def Preliminary_Behavior "OnAddedToScene"
+        {
+            rel actions = </Root/Environment/OnAddedToScene/Action>
+            uniform bool exclusive
+            rel triggers = </Root/Environment/OnAddedToScene/Trigger>
+
+            def Preliminary_Trigger "Trigger"
+            {
+                rel affectedObjects = </Root/Environment>
+                token info:id = "SceneTransition"
+            }
+
+            def Preliminary_Action "Action"
+            {
+                rel affectedObjects = </Root>
+                rel animationLibraryKey = </Root/CarMovement>
+                rel animationLibraryKeyOverrideKey = </Root/Environment/OnAddedToScene/Trigger>
+                token info:id = "PlayTimeline"
+                int loops = 0
+                int performCount = 1
+                token type = "serial"
+            }
+        }
     }
 
-    def "GridMaterial" (
+    def "SkyDome" (
         active = true
-        references = @Materials/GridMaterial.usda@
+        prepend apiSchemas = ["MaterialBindingAPI"]
+        references = @SkyDome.usdz@
     )
     {
-        quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (0, 0, 0)
+        reorder nameChildren = ["Dome_01", "Ground_01", "Grid", "Looks", "SkyDomeMaterial"]
+        rel material:binding = </Root/SkyDome/SkyDomeMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        float3 xformOp:scale = (3, 3, 3)
+        float3 xformOp:translate = (0, -511.41956, -2854.7937)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        over "Looks"
+        {
+            over "GridMATSG"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "GroundMATSG"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "DomeMATSG"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+        }
+
+        def Material "SkyDomeMaterial"
+        {
+            token cullMode = "unspecified" (
+                allowedTokens = ["unspecified", "none", "front", "back"]
+            )
+            token inputs:frame:stPrimvarName = "st" (
+                customData = {
+                    dictionary realitykit = {
+                        bool hide = 1
+                    }
+                }
+            )
+            token outputs:mtlx:surface.connect = </Root/SkyDome/SkyDomeMaterial/PreviewSurface.outputs:out>
+            token outputs:realitykit:vertex
+            token outputs:surface.connect = </Root/SkyDome/SkyDomeMaterial/UsdPreviewSurface.outputs:surface>
+            float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (335.5, 100.5)
+
+            def Shader "PreviewSurface" (
+                active = false
+            )
+            {
+                uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
+                color3f inputs:diffuseColor.connect = </Root/SkyDome/SkyDomeMaterial/Image.outputs:out>
+                float3 inputs:normal
+                float inputs:roughness
+                token outputs:out
+                float2 ui:nodegraph:node:pos = (93.5, 100.5)
+            }
+
+            def Shader "Image"
+            {
+                uniform token info:id = "ND_image_color3"
+                asset inputs:file = @rosendal_plains_2_4k.hdr@
+                string inputs:filtertype
+                string inputs:vaddressmode
+                color3f outputs:out
+                float2 ui:nodegraph:node:pos = (-179.58388, 52.912262)
+                int ui:nodegraph:node:stackingOrder = 16
+                string[] ui:nodegraph:realitykit:node:attributesShowingChildren = []
+            }
+
+            def Shader "UsdPreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.18, 0.18, 0.18)
+                color3f inputs:diffuseColor.connect = </Root/SkyDome/SkyDomeMaterial/diffuseColor.outputs:rgb>
+                token outputs:surface
+            }
+
+            def Shader "diffuseColor"
+            {
+                uniform token info:id = "UsdUVTexture"
+                asset inputs:file = @rosendal_plains_2_4k.hdr@
+                float2 inputs:st.connect = </Root/SkyDome/SkyDomeMaterial/diffuseColor/TexCoordReader.outputs:result>
+                color3f outputs:rgb
+
+                def Shader "TexCoordReader"
+                {
+                    uniform token info:id = "UsdPrimvarReader_float2"
+                    token inputs:varname.connect = </Root/SkyDome/SkyDomeMaterial.inputs:frame:stPrimvarName>
+                    float2 outputs:result
+                }
+            }
+        }
+
+        over "Dome_01" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </Root/SkyDome/SkyDomeMaterial> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+            float3 xformOp:translate = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+        }
+
+        over "Ground_01" (
+            active = false
+        )
+        {
+        }
+
+        over "Grid" (
+            active = false
+        )
+        {
+        }
+    }
+
+    def Xform "DirectionalLight" (
+        customData = {
+            float3 rotationEulerHint = (-0.78539807, 9.319311e-8, -1.8968203e-8)
+        }
+    )
+    {
+        quatf xformOp:orient = (0.92387956, -0.3826834, 4.667901e-8, 9.06956e-9)
+        float3 xformOp:translate = (-6.1953614e-8, 100.04203, 100)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def RealityKitComponent "DirectionalLight"
+        {
+            token info:id = "RealityKit.DirectionalLight"
+            float intensity = 5000
+
+            def RealityKitStruct "Shadow"
+            {
+            }
+        }
+    }
+
+    def Xform "DirectionalLight_1" (
+        customData = {
+            float3 rotationEulerHint = (1.5707964, 9.3193094e-8, -1.896821e-8)
+        }
+    )
+    {
+        float2 ui:nodegraph:node:pos = (73.70806, 56.912262)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (0.70710677, 0.70710677, 2.6242459e-8, -3.9655006e-8)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (-6.1953614e-8, 100.04203, 100)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def RealityKitComponent "DirectionalLight"
+        {
+            token info:id = "RealityKit.DirectionalLight"
+            float intensity = 5000
+
+            def RealityKitStruct "Shadow"
+            {
+            }
+        }
+    }
+
+    def RealityKitTimeline "CarMovement"
+    {
+        reorder nameChildren = ["Track", "Track2"]
+        def RealityKitTrack "Track"
+        {
+            reorder nameChildren = ["Transform_To", "Transform_To2", "Transform_To3", "Transform_To22", "Transform_To32", "Transform_To222", "Transform_To32_1", "Transform_To222_1", "Transform_To32_2", "Transform_To22_1", "Transform_To32_3", "Transform_To22_12", "Transform_To32_4"]
+            def RealityKitAction "Transform_To"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 30
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -949.47327)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 0
+                rel target = </Root/Environment>
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To2"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 0.05140758873929007
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -1563.428)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 30.0000000001
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (73.70806, 56.912262)
+                int ui:nodegraph:node:stackingOrder = 1
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To3"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 30
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -949.47327)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 30.05140758893929
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (73.70806, 56.912262)
+                int ui:nodegraph:node:stackingOrder = 1
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To22"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 0.05140758873929007
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -1563.428)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 60.05140758903929
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (93.70806, 76.91226)
+                int ui:nodegraph:node:stackingOrder = 2
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To32"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 30
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -949.47327)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 60.10281517787859
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (93.70806, 76.91226)
+                int ui:nodegraph:node:stackingOrder = 2
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To222"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 0.05140316915869962
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -1563.428)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 90.10281517797861
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (113.70806, 96.91226)
+                int ui:nodegraph:node:stackingOrder = 3
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To32_1"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 30
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -949.47327)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 90.15421834723733
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (113.70806, 96.91226)
+                int ui:nodegraph:node:stackingOrder = 3
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To222_1"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 0.05140316915869962
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -1563.428)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 120.15421834733735
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (133.70807, 116.91226)
+                int ui:nodegraph:node:stackingOrder = 4
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To32_2"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 120
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -949.47327)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 120.20562151659607
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (133.70807, 116.91226)
+                int ui:nodegraph:node:stackingOrder = 4
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To22_1"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 0.051398146822804455
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -1563.428)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 240.20562151669606
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (113.70806, 96.91226)
+                int ui:nodegraph:node:stackingOrder = 3
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To32_3"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 120
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -949.47327)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 240.25701966361885
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (153.70807, 136.91226)
+                int ui:nodegraph:node:stackingOrder = 5
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To22_12"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 0.051398146822804455
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -1563.428)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 360.25701966371884
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (133.70807, 116.91226)
+                int ui:nodegraph:node:stackingOrder = 4
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+
+            def RealityKitAction "Transform_To32_4"
+            {
+                string actionKind = "moveTo"
+                int blendLayer = 300
+                double duration = 120
+                uniform token info:id = "32F4FC75-AB25-41C2-A7DD-C3DBDA163E12"
+                float3 position = (1015.8237, 100, -949.47327)
+                quatf rotation = (0.8433914, 1.447463e-7, 0.53729963, -9.22135e-8)
+                float3 scale = (100, 100, 100)
+                double startTime = 360.3084178106416
+                rel target = </Root/Environment>
+                float2 ui:nodegraph:node:pos = (173.70807, 156.91226)
+                int ui:nodegraph:node:stackingOrder = 6
+
+                def RealityKitStruct "transformMode"
+                {
+                    rel referenceEntity = </Root>
+                    token type = "parent"
+                }
+
+                def RealityKitStruct "timingFunction"
+                {
+                }
+            }
+        }
     }
 }
 
