@@ -25,6 +25,28 @@ class SessionController {
 //        }
 //    }
     
+    var game: GameModel {
+        get {
+            gameSyncStore.game
+        }
+        set {
+            if newValue != gameSyncStore.game {
+                gameSyncStore.game = newValue
+                shareLocalGameState(newValue)
+            }
+        }
+    }
+    
+    var gameSyncStore = GameSyncStore() {
+        didSet {
+            gameStateChanged()
+        }
+    }
+    
+    struct GameSyncStore {
+        var game = GameModel()
+    }
+    
     var localPlayer: PlayerModel {
         get {
             players[session.localParticipant]!
@@ -72,6 +94,17 @@ class SessionController {
         }
     }
     
+    //send game model state message via messenger
+    func shareLocalGameState(_ newValue: GameModel) {
+        Task {
+            do {
+                try await messenger.send(newValue)
+            } catch {
+                // Failed to send the message.
+            }
+        }
+    }
+    
     func observeRemoteParticipantUpdates() {
         observeRemotePlayerModelUpdates()
     }
@@ -85,6 +118,21 @@ class SessionController {
                 }
 
             }
+        }
+    }
+    
+    func gameStateChanged() {
+        updateSpatialTemplatePreference()
+    }
+    
+    func updateSpatialTemplatePreference() {
+        switch game.stage {
+        case .Pre_Geyser:
+            systemCoordinator.configuration.spatialTemplatePreference = .surround
+        case .InGame_Geyser:
+            systemCoordinator.configuration.spatialTemplatePreference = .surround
+        case .After_Geyser:
+            systemCoordinator.configuration.spatialTemplatePreference = .surround
         }
     }
 }

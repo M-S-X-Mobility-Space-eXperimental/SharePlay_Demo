@@ -12,55 +12,19 @@ import GroupActivities
 
 struct ContentView: View {
     @Environment(AppModel.self) var appModel
-    @State var enlarged: Bool = false
-
+    
     var body: some View {
-        RealityView { content in
-            // Add the initial RealityKit content
-            if let scene = try? await Entity(named: "Scene", in: realityKitContentBundle) {
-                content.add(scene)
+        Group {
+            switch appModel.sessionController?.game.stage {
+            case .none:
+                WelcomeView()
+            case .Pre_Geyser:
+                WelcomeView()
+            case .InGame_Geyser:
+                WelcomeView()
+            case .After_Geyser:
+                WelcomeView()
             }
-        } update: { content in
-            // Update the RealityKit content when SwiftUI state changes
-            if let scene = content.entities.first {
-                let uniformScale: Float = appModel.sessionController?.localPlayer.enlarged ?? enlarged ? 1.4 : 1.0
-                scene.transform.scale = [uniformScale, uniformScale, uniformScale]
-            }
-        }
-        .gesture(TapGesture().targetedToAnyEntity().onEnded { _ in
-            appModel.sessionController?.localPlayer.enlarged.toggle()
-        })
-        .toolbar {
-//            ToolbarItemGroup(placement: .bottomOrnament) {
-                VStack (spacing: 12) {
-                    Button {
-                        if appModel.sessionController == nil {
-                            enlarged.toggle()
-                        }
-                        appModel.sessionController?.localPlayer.enlarged.toggle()
-                    } label: {
-                        Text(appModel.sessionController?.localPlayer.enlarged ?? enlarged ? "Reduce RealityView Content" : "Enlarge RealityView Content")
-                    }
-                    .animation(.none, value: 0)
-                    .fontWeight(.semibold)
-                    
-                    Button {
-                        if let players = appModel.sessionController?.players {
-                            print("players size: \(players.count)")
-//                            for (participant, playerModel) in players {
-//                                print("Participant ID: \(participant.id)")
-//                                print("Player enlarged bool: \(playerModel.enlarged)")
-//                                print("-----------------------")
-//                            }
-                        }
-                    } label: {
-                        Text("print")
-                    }
-                    
-                    SharePlayButton().padding(.vertical, 20)
-                    ToggleImmersiveSpaceButton()
-                }
-//            }a
         }
         .task(observeGroupSessions)
     }
@@ -92,32 +56,7 @@ struct ContentView: View {
     }
 }
 
-struct SharePlayButton: View {
-    @StateObject
-    var groupStateObserver = GroupStateObserver()
-    
-    var body: some View {
-        ZStack {
-            ShareLink(
-                item: PlayTogether(),
-                preview: SharePreview("Play Together!")
-            )
-            .hidden()
-            
-            Button("Play Together", systemImage: "shareplay") {
-                Task.detached {
-                    try await PlayTogether().activate()
-                }
-            }
-            .disabled(!groupStateObserver.isEligibleForGroupSession)
-            .tint(.green)
-        }
-    }
-}
-
-
-
-#Preview(windowStyle: .volumetric) {
+#Preview(windowStyle: .plain) {
     ContentView()
         .environment(AppModel())
 }

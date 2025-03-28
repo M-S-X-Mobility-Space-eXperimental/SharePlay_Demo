@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "yellowstone-national-park-badge-gkh3m2u1a8o48aqv.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

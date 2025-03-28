@@ -14,10 +14,12 @@ struct SharePlay_DemoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(appModel)
+            NavigationStack {
+                ContentView()
+                    .environment(appModel)
+            }
+            .frame(width: 900, height: 600)
         }
-        .windowStyle(.volumetric)
 
         ImmersiveSpace(id: appModel.immersiveSpaceID) {
             ImmersiveView()
