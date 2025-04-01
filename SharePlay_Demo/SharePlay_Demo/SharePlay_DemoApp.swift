@@ -15,12 +15,9 @@ struct SharePlay_DemoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if appModel.immersiveSpaceState == .closed {
                 ContentView()
                     .environment(appModel)
                 .frame(width: 1200, height: 800)
-                .opacity(appModel.immersiveSpaceState == .open ? 0 : 1)
-            }
         }
         .windowStyle(.volumetric)
 

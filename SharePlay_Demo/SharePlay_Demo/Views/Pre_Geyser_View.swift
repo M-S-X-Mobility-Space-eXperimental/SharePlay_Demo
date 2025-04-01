@@ -9,6 +9,7 @@ import SwiftUI
 
 struct Pre_Geyser_View: View {
     @Environment(AppModel.self) var appModel
+    @Environment(\.dismissWindow) private var dismissWindow
     
     var body: some View {
         VStack{
@@ -29,6 +30,9 @@ struct Pre_Geyser_View: View {
             else if appModel.sessionController?.game.stage == .After_Geyser {
                 AnimatedTypingText(fullText: "This incredible display occurs due to water heated deep underground by magma chambers. Temperatures here can exceed 350 degrees Fahrenheit, creating immense pressure that propels the water upward with impressive force. Fun fact: Old Faithful has erupted over a million times since Yellowstone became a national park in 1872, demonstrating its stunning consistency. Each eruption, uniquely powerful yet elegantly rhythmic, is a vivid reminder of the dynamic geological processes constantly reshaping our planet beneath our very feet.")
             }
+        }
+        .onChange(of: appModel.immersiveSpaceState){
+            dismissWindow()
         }
         .padding()
         .padding(.horizontal, 100)
